@@ -2,17 +2,20 @@ import { Button } from "./ui/button"
 import { useState} from "react";
 import { useTheme } from "@/hooks/useTheme";
 import { Moon,Sun } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Header({filter, setFilter, setTodos}) {
     const {theme, toggleTheme} = useTheme();
 
     console.log("Header Rendered")
     const [task, setTask] = useState("");
-    const handleAdd = () => {
+    const handleAdd = async () => {
     if (!task.trim()) return;
-    const newTodo= {id:crypto.randomUUID(), text: task, completed: false};
-    setTodos((prev) => [...prev, newTodo]),
-    setTask(""); 
+    const newTodo= { text: task, completed: false};
+    const {data, error} = await supabase.from("todos").insert([newTodo]).select();
+    if (error) console.error("Error adding todo: ", error);
+    else setTodos((prev) => [...prev, ...(data || [])]);
+    setTask("");
   };
   return (
     <>
@@ -20,13 +23,13 @@ export default function Header({filter, setFilter, setTodos}) {
         <h1 className="text-2xl font-bold mb-4 text-center ">
           Todo App
         </h1>
-        <button variant="outline" 
+        <Button variant="outline" 
         className="border-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
         size="icon" 
         onClick={toggleTheme}>
             {theme === "light" ? <Moon className="h-5 w-5 text-gray-800" /> 
             : <Sun className="h-5 w-5 text-yellow-400" /> }
-        </button>
+        </Button>
         </header>
         {/* filtered buttons */}
         <div className="flex justify-center gap-4 mb-4">

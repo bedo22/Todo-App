@@ -2,8 +2,10 @@ import { Button } from "./ui/button";
 import {motion, AnimatePresence} from "framer-motion"
 import React from "react";
 import { useState } from "react";
+// import { AlertDialog, AlertDialogTrigger, AlertDialogContent, ... } from "@/components/ui/alert-dialog"
 
-export default React.memo(function TodoList({todos, filter, toggleCompleted, handleDelete, handleEdit}){
+
+export default React.memo(function TodoList({todos, filter, toggleCompleted, clearCompleted, handleDelete, handleEdit}){
     console.log("Todolist Rendered");
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
@@ -26,7 +28,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
       if (filter === "completed") return todo.completed;
       return true; // 'all'
       });
-
+    
   return (
         <>
         <ul className="space-y-2">
@@ -37,7 +39,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
             filteredTodos.map((todo) => (
             <motion.li 
             key={todo.id}
-            initial={{oppacity: 0, y: 15}}
+            initial={{opacity: 0, y: 15}}
             animate={{opacity: 1, y: 0}}
             exit={{opacity: 0, y: -15}}
             transition={{duration: 0.25}}
@@ -48,7 +50,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
             <input
             type="checkbox"
             checked={todo.completed}
-            onChange={() => toggleCompleted(todo.id)}
+            onChange={() => toggleCompleted(todo.id, todo.completed)}
             className="w-4 h-4 accent-green-500"
             />
             <AnimatePresence mode="wait" initial={false}>
@@ -58,7 +60,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
               initial={{opacity: 0, scale: 0.95}}
               animate={{opacity: 1, scale: 1}}
               exit={{opacity: 0, scale: 0.95}}
-              transition={{duaration: 0.2}}
+              transition={{duration: 0.2}}
               className="flex flex-1 items-center space-x-2"
               >
                 <input
@@ -77,7 +79,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
                 <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => handleEditClick(todo)}
+                    onClick={() => handleSaveEdit(todo.id)}
                     >
                         💾
                   </Button>
@@ -91,11 +93,11 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
                   </motion.div>
             ) : (
               <motion.div
-              key="edit"
+              key="view"
               initial={{opacity: 0, scale: 0.95}}
               animate={{opacity: 1, scale: 1}}
               exit={{opacity: 0, scale: 0.95}}
-              transition={{duaration: 0.2}}
+              transition={{duration: 0.2}}
               className="flex flex-1 items-center space-x-2"
               >
               <span className={`flex-1 truncate ${todo.completed ? "line-through text-gray-500": ""}`}>
@@ -131,9 +133,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, han
         {filter === "completed" && filteredTodos.length > 0 && (
         <div className="mt-4 flex justify-end">
           <button
-            onClick={() =>
-              setTodos((prev) => prev.filter((t) => !t.completed))
-            }
+            onClick={clearCompleted}
             className="text-sm text-red-500 hover:underline"
           >
             Clear Completed
