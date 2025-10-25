@@ -1,5 +1,5 @@
 import { Button } from "./ui/button";
-import {motion, AnimatePresence} from "framer-motion"
+import {AnimatePresence, motion} from "framer-motion"
 import React from "react";
 import { useState } from "react";
 // import { AlertDialog, AlertDialogTrigger, AlertDialogContent, ... } from "@/components/ui/alert-dialog"
@@ -11,7 +11,7 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, cle
     const [editText, setEditText] = useState("");
     const handleEditClick = (todo) => {
         setEditingId(todo.id);
-        setEditText(todo.text);
+        setEditText(todo.task);
     };
     const handleSaveEdit = (id) => {
         if (editText.trim()) {
@@ -24,8 +24,8 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, cle
       setEditText("");
     }
     const filteredTodos = todos.filter((todo) => {
-      if (filter === "active") return !todo.completed;
-      if (filter === "completed") return todo.completed;
+      if (filter === "active") return !todo.is_complete;
+      if (filter === "completed") return todo.is_complete;
       return true; // 'all'
       });
     
@@ -49,8 +49,8 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, cle
             <div className="flex items-center flex-1 space-x-2">
             <input
             type="checkbox"
-            checked={todo.completed}
-            onChange={() => toggleCompleted(todo.id, todo.completed)}
+            checked={todo.is_complete}
+            onChange={() => toggleCompleted(todo.id, todo.is_complete)}
             className="w-4 h-4 accent-green-500"
             />
             <AnimatePresence mode="wait" initial={false}>
@@ -100,8 +100,8 @@ export default React.memo(function TodoList({todos, filter, toggleCompleted, cle
               transition={{duration: 0.2}}
               className="flex flex-1 items-center space-x-2"
               >
-              <span className={`flex-1 truncate ${todo.completed ? "line-through text-gray-500": ""}`}>
-                {todo.text}
+              <span className={`flex-1 truncate ${todo.is_complete ? "line-through text-gray-500": ""}`}>
+                {todo.task}
               </span>
               <div className="flex items-center space-x-2 ml-2">
                 <Button
